@@ -1,10 +1,10 @@
 package config
 
-// Stack holds the configuration settings for the stack.
+// Stack holds the configuration for the entire stack.
 type Stack struct {
-	References StackReferences `json:"stack-references"`
-	Resources  []Resource      `json:"resources"`
+	StackAliases StackAliases `json:"stack-aliases"`
+	Resources    []Resource   `json:"resources"`
 }
 
-// StackReferences maps a short name to an actual stack name for use in referencing resources in other stacks.
-type StackReferences map[string]string
+// StackAliases are used to shorten stack reference paths to alias names.
+type StackAliases map[string]string
