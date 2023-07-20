@@ -15,7 +15,7 @@ type ContainerRegistry struct {
 	ID               string `json:"id"`
 	Name             string `json:"name"`
 	Region           string `json:"region"`
-	SubscriptionTier string `json:"subscription-tier"`
+	SubscriptionTier string `json:"subscriptionTier"`
 }
 
 // NewContainerRegistry returns a new, empty object.

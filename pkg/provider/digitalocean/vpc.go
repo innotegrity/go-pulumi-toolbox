@@ -15,7 +15,7 @@ type VPC struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	IpRange     string `json:"ip-range"`
+	IPRange     string `json:"ipRange"`
 	Region      string `json:"region"`
 }
 
@@ -63,7 +63,7 @@ func (v VPC) Provision(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (
 	res, err := do.NewVpc(ctx, v.ID, &do.VpcArgs{
 		Name:        pulumi.String(v.Name),
 		Description: pulumi.String(v.Description),
-		IpRange:     pulumi.String(v.IpRange),
+		IpRange:     pulumi.String(v.IPRange),
 		Region:      pulumi.String(strings.ToLower(v.Region)),
 	}, opts...)
 	if err != nil {

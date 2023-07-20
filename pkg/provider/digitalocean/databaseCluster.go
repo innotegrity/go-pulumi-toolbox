@@ -17,11 +17,11 @@ type DatabaseCluster struct {
 	Name               string                             `json:"name"`
 	Engine             string                             `json:"engine"`
 	Version            string                             `json:"version"`
-	NodeCount          uint                               `json:"node-count"`
+	NodeCount          uint                               `json:"nodeCount"`
 	Size               string                             `json:"size"`
-	MaintenanceWindows []databaseClusterMaintenanceWindow `json:"maintenance-windows"`
-	PrivateNetworkID   string                             `json:"vpc-id"`
-	ProjectID          string                             `json:"project-id"`
+	MaintenanceWindows []databaseClusterMaintenanceWindow `json:"maintenanceWindows"`
+	PrivateNetworkID   string                             `json:"vpcID"`
+	ProjectID          string                             `json:"projectID"`
 	Region             string                             `json:"region"`
 	Tags               []string                           `json:"tags"`
 }

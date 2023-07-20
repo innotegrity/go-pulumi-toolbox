@@ -12,7 +12,7 @@ import (
 // DatabaseFirewall is used for creating a database firewall resource in DigitalOcean.
 type DatabaseFirewall struct {
 	ID        string                 `json:"id"`
-	ClusterID string                 `json:"cluster-id"`
+	ClusterID string                 `json:"clusterID"`
 	Rules     []databaseFirewallRule `json:"rules"`
 }
 

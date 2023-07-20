@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/pulumi/pulumi-digitalocean/sdk/v4 v4.19.4
+	github.com/pulumi/pulumi-google-native/sdk v0.30.0
 	github.com/pulumi/pulumi/sdk/v3 v3.75.0
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
 )
