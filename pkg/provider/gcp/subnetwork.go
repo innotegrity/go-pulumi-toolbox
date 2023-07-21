@@ -13,39 +13,39 @@ import (
 // Subnetwork is used for creating a subnet resource.
 type Subnetwork struct {
 	ID                      string               `json:"id"`
-	Description             string               `json:"description"`
-	EnableFlowLogs          bool                 `json:"enableFlowLogs"`
-	Region                  string               `json:"region"`
-	ExternalIPv6Prefix      string               `json:"externalIPv6Prefix"`
-	IPRange                 string               `json:"ipRange"`
-	IPv6AccessType          string               `json:"ipv6AccessType"`
+	Description             *string              `json:"description"`
+	EnableFlowLogs          *bool                `json:"enableFlowLogs"`
+	Region                  *string              `json:"region"`
+	ExternalIPv6Prefix      *string              `json:"externalIPv6Prefix"`
+	IPRange                 *string              `json:"ipRange"`
+	IPv6AccessType          *string              `json:"ipv6AccessType"`
 	LogConfig               *subnetworkLogConfig `json:"logConfig"`
-	Name                    string               `json:"name"`
-	Network                 string               `json:"network"`
-	PrivateIPGoogleAccess   bool                 `json:"privateIPGoogleAccess"`
-	PrivateIPv6GoogleAccess string               `json:"privateIPv6GoogleAccess"`
-	Project                 string               `json:"project"`
-	Purpose                 string               `json:"purpose"`
-	RequestID               string               `json:"requestID"`
-	Role                    string               `json:"role"`
+	Name                    *string              `json:"name"`
+	Network                 *string              `json:"network"`
+	PrivateIPGoogleAccess   *bool                `json:"privateIPGoogleAccess"`
+	PrivateIPv6GoogleAccess *string              `json:"privateIPv6GoogleAccess"`
+	Project                 *string              `json:"project"`
+	Purpose                 *string              `json:"purpose"`
+	RequestID               *string              `json:"requestID"`
+	Role                    *string              `json:"role"`
 	SecondaryIPRanges       []subnetworkIPRange  `json:"secondaryIPRanges"`
-	StackType               string               `json:"ipStackType"`
+	StackType               *string              `json:"ipStackType"`
 }
 
 // subnetworkLogConfig holds the logging configuration for a subnet.
 type subnetworkLogConfig struct {
-	AggregationInterval string   `json:"aggregationInterval"`
-	Enable              bool     `json:"enable"`
-	FilterExpr          string   `json:"filterExpr"`
-	FlowSampling        float64  `json:"flowSampling"`
-	Metadata            string   `json:"metadata"`
+	AggregationInterval *string  `json:"aggregationInterval"`
+	Enable              *bool    `json:"enable"`
+	FilterExpr          *string  `json:"filterExpr"`
+	FlowSampling        *float64 `json:"flowSampling"`
+	Metadata            *string  `json:"metadata"`
 	MetadataFields      []string `json:"metadataFields"`
 }
 
 // subnetworkIPRange contains information about a secondary IP range for a subnet.
 type subnetworkIPRange struct {
-	IPRange string `json:"ipRange"`
-	Name    string `json:"name"`
+	IPRange *string `json:"ipRange"`
+	Name    *string `json:"name"`
 }
 
 // NewSubnetwork returns a new, empty object.
@@ -89,73 +89,87 @@ func (s Subnetwork) Provision(ctx *pulumi.Context, opts ...pulumi.ResourceOption
 	resId := state.MakeResourceID(ctx, s.GetType(), s.GetID())
 	stackState := state.Get()
 
-	// initialize known arguments without defaults
-	args := googlecompute.SubnetworkArgs{
-		Description:           pulumi.String(s.Description),
-		EnableFlowLogs:        pulumi.Bool(s.EnableFlowLogs),
-		Region:                pulumi.String(s.Region),
-		IpCidrRange:           pulumi.String(s.IPRange),
-		Name:                  pulumi.String(s.Name),
-		PrivateIpGoogleAccess: pulumi.Bool(s.PrivateIPGoogleAccess),
+	// check required arguments
+	if s.Region == nil || *s.Region == "" {
+		return nil, fmt.Errorf("'region' is a required setting")
+	}
+	if s.Network == nil || *s.Network == "" {
+		return nil, fmt.Errorf("'network' is a required setting")
 	}
 
-	// only pass arguments which were specified in the config
-	if s.ExternalIPv6Prefix != "" {
-		args.ExternalIpv6Prefix = pulumi.String(s.ExternalIPv6Prefix)
+	// initialize args
+	args := googlecompute.SubnetworkArgs{
+		Region: pulumi.String(*s.Region),
 	}
-	if s.IPv6AccessType != "" {
-		args.Ipv6AccessType = googlecompute.SubnetworkIpv6AccessType(strings.ToUpper(s.IPv6AccessType))
+	if s.Name != nil {
+		args.Name = pulumi.String(*s.Name)
 	}
-	if s.PrivateIPv6GoogleAccess != "" {
+	if s.Description != nil {
+		args.Description = pulumi.String(*s.Description)
+	}
+	if s.EnableFlowLogs != nil {
+		args.EnableFlowLogs = pulumi.Bool(*s.EnableFlowLogs)
+	}
+	if s.ExternalIPv6Prefix != nil {
+		args.ExternalIpv6Prefix = pulumi.String(*s.ExternalIPv6Prefix)
+	}
+	if s.IPRange != nil {
+		args.IpCidrRange = pulumi.String(*s.IPRange)
+	}
+	if s.IPv6AccessType != nil {
+		args.Ipv6AccessType = googlecompute.SubnetworkIpv6AccessType(strings.ToUpper(*s.IPv6AccessType))
+	}
+	if s.PrivateIPGoogleAccess != nil {
+		args.PrivateIpGoogleAccess = pulumi.Bool(*s.PrivateIPGoogleAccess)
+	}
+	if s.PrivateIPv6GoogleAccess != nil {
 		args.PrivateIpv6GoogleAccess = googlecompute.SubnetworkPrivateIpv6GoogleAccess(
-			strings.ToUpper(s.PrivateIPv6GoogleAccess))
+			strings.ToUpper(*s.PrivateIPv6GoogleAccess))
 	}
-	if s.Project != "" {
-		args.Project = pulumi.String(s.Project)
+	if s.Project != nil {
+		args.Project = pulumi.String(*s.Project)
 	}
-	if s.Purpose != "" {
-		args.Purpose = googlecompute.SubnetworkPurpose(strings.ToUpper(s.Purpose))
+	if s.Purpose != nil {
+		args.Purpose = googlecompute.SubnetworkPurpose(strings.ToUpper(*s.Purpose))
 	}
-	if s.RequestID != "" {
-		args.RequestId = pulumi.String(s.RequestID)
+	if s.RequestID != nil {
+		args.RequestId = pulumi.String(*s.RequestID)
 	}
-	if s.Role != "" {
-		args.Role = googlecompute.SubnetworkRole(strings.ToUpper(s.Role))
+	if s.Role != nil {
+		args.Role = googlecompute.SubnetworkRole(strings.ToUpper(*s.Role))
 	}
-	if s.StackType != "" {
-		args.StackType = googlecompute.SubnetworkStackType(strings.ToUpper(s.StackType))
+	if s.StackType != nil {
+		args.StackType = googlecompute.SubnetworkStackType(strings.ToUpper(*s.StackType))
 	}
 
 	// lookup network ID
-	if s.Network == "" {
-		return nil, fmt.Errorf("network is required")
-	}
-	id, err := stackState.GetOutput(ctx, s.Network)
+	id, err := stackState.GetOutput(ctx, *s.Network)
 	if err != nil {
 		return nil, err
 	}
 	args.Network = id.ApplyT(func(id string) string {
-		ctx.Log.Debug(fmt.Sprintf("'%s': network retrieved", s.Network), nil)
+		ctx.Log.Debug(fmt.Sprintf("'%s': network ID retrieved", *s.Network), nil)
 		return id
 	}).(pulumi.StringOutput)
 
 	// setup logging configuration
 	if s.LogConfig != nil {
-		config := googlecompute.SubnetworkLogConfigArgs{
-			Enable: pulumi.Bool(s.LogConfig.Enable),
-		}
-		if s.LogConfig.AggregationInterval != "" {
+		config := googlecompute.SubnetworkLogConfigArgs{}
+		if s.LogConfig.AggregationInterval != nil {
 			config.AggregationInterval = googlecompute.SubnetworkLogConfigAggregationInterval(
-				strings.ToUpper(s.LogConfig.AggregationInterval))
+				strings.ToUpper(*s.LogConfig.AggregationInterval))
 		}
-		if s.LogConfig.FilterExpr != "" {
-			config.FilterExpr = pulumi.String(s.LogConfig.FilterExpr)
+		if s.LogConfig.Enable != nil {
+			config.Enable = pulumi.Bool(*s.LogConfig.Enable)
 		}
-		if s.LogConfig.FlowSampling != 0 {
-			config.FlowSampling = pulumi.Float64(s.LogConfig.FlowSampling)
+		if s.LogConfig.FilterExpr != nil {
+			config.FilterExpr = pulumi.String(*s.LogConfig.FilterExpr)
 		}
-		if s.LogConfig.Metadata != "" {
-			config.Metadata = googlecompute.SubnetworkLogConfigMetadata(strings.ToUpper(s.LogConfig.Metadata))
+		if s.LogConfig.FlowSampling != nil {
+			config.FlowSampling = pulumi.Float64(*s.LogConfig.FlowSampling)
+		}
+		if s.LogConfig.Metadata != nil {
+			config.Metadata = googlecompute.SubnetworkLogConfigMetadata(strings.ToUpper(*s.LogConfig.Metadata))
 		}
 		if len(s.LogConfig.MetadataFields) > 0 {
 			config.MetadataFields = pulumi.ToStringArray(s.LogConfig.MetadataFields)
@@ -167,10 +181,14 @@ func (s Subnetwork) Provision(ctx *pulumi.Context, opts ...pulumi.ResourceOption
 	if len(s.SecondaryIPRanges) > 0 {
 		ranges := googlecompute.SubnetworkSecondaryRangeArray{}
 		for _, r := range s.SecondaryIPRanges {
-			ranges = append(ranges, googlecompute.SubnetworkSecondaryRangeArgs{
-				IpCidrRange: pulumi.String(r.IPRange),
-				RangeName:   pulumi.String(r.Name),
-			})
+			config := googlecompute.SubnetworkSecondaryRangeArgs{}
+			if r.IPRange != nil {
+				config.IpCidrRange = pulumi.String(*r.IPRange)
+			}
+			if r.Name != nil {
+				config.RangeName = pulumi.String(*r.Name)
+			}
+			ranges = append(ranges, config)
 		}
 		args.SecondaryIpRanges = ranges
 	}

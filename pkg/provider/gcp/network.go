@@ -12,17 +12,17 @@ import (
 
 // Network is used for creating a network resource.
 type Network struct {
-	ID                                    string `json:"id"`
-	AutoCreateSubnets                     bool   `json:"autoCreateSubnets"`
-	Description                           string `json:"description"`
-	EnableUlaInternalIPv6                 bool   `json:"enableUlaInternalIPv6"`
-	InternalIPv6Range                     string `json:"internalIPv6Range"`
-	MTU                                   int    `json:"mtu"`
-	Name                                  string `json:"name"`
-	NetworkFirewallPolicyEnforcementOrder string `json:"networkFirewallPolicyEnforcementOrder"`
-	Project                               string `json:"project"`
-	RequestID                             string `json:"requestID"`
-	RoutingMode                           string `json:"routingMode"`
+	ID                                    string  `json:"id"`
+	AutoCreateSubnets                     *bool   `json:"autoCreateSubnets"`
+	Description                           *string `json:"description"`
+	EnableUlaInternalIPv6                 *bool   `json:"enableUlaInternalIPv6"`
+	InternalIPv6Range                     *string `json:"internalIPv6Range"`
+	MTU                                   *int    `json:"mtu"`
+	Name                                  *string `json:"name"`
+	NetworkFirewallPolicyEnforcementOrder *string `json:"networkFirewallPolicyEnforcementOrder"`
+	Project                               *string `json:"project"`
+	RequestID                             *string `json:"requestID"`
+	RoutingMode                           *string `json:"routingMode"`
 }
 
 // NewNetwork returns a new, empty object.
@@ -65,34 +65,39 @@ func (n Network) Provision(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (
 
 	resId := state.MakeResourceID(ctx, n.GetType(), n.GetID())
 
-	// initialize known arguments without defaults
-	args := googlecompute.NetworkArgs{
-		AutoCreateSubnetworks: pulumi.Bool(n.AutoCreateSubnets),
-		Description:           pulumi.String(n.Description),
-		EnableUlaInternalIpv6: pulumi.Bool(n.EnableUlaInternalIPv6),
-		Name:                  pulumi.String(n.Name),
+	// initialize args
+	args := googlecompute.NetworkArgs{}
+	if n.Name != nil {
+		args.Name = pulumi.String(*n.Name)
 	}
-
-	// only pass arguments which were specified in the config
-	if n.InternalIPv6Range != "" {
-		args.InternalIpv6Range = pulumi.String(n.InternalIPv6Range)
+	if n.Description != nil {
+		args.Description = pulumi.String(*n.Description)
 	}
-	if n.MTU != 0 {
-		args.Mtu = pulumi.Int(n.MTU)
+	if n.AutoCreateSubnets != nil {
+		args.AutoCreateSubnetworks = pulumi.Bool(*n.AutoCreateSubnets)
 	}
-	if n.NetworkFirewallPolicyEnforcementOrder != "" {
+	if n.EnableUlaInternalIPv6 != nil {
+		args.EnableUlaInternalIpv6 = pulumi.Bool(*n.EnableUlaInternalIPv6)
+	}
+	if n.InternalIPv6Range != nil {
+		args.InternalIpv6Range = pulumi.String(*n.InternalIPv6Range)
+	}
+	if n.MTU != nil {
+		args.Mtu = pulumi.Int(*n.MTU)
+	}
+	if n.NetworkFirewallPolicyEnforcementOrder != nil {
 		args.NetworkFirewallPolicyEnforcementOrder = googlecompute.NetworkNetworkFirewallPolicyEnforcementOrder(
-			strings.ToUpper(n.NetworkFirewallPolicyEnforcementOrder))
+			strings.ToUpper(*n.NetworkFirewallPolicyEnforcementOrder))
 	}
-	if n.Project != "" {
-		args.Project = pulumi.String(n.Project)
+	if n.Project != nil {
+		args.Project = pulumi.String(*n.Project)
 	}
-	if n.RequestID != "" {
-		args.RequestId = pulumi.String(n.RequestID)
+	if n.RequestID != nil {
+		args.RequestId = pulumi.String(*n.RequestID)
 	}
-	if n.RoutingMode != "" {
+	if n.RoutingMode != nil {
 		args.RoutingConfig = googlecompute.NetworkRoutingConfigArgs{
-			RoutingMode: googlecompute.NetworkRoutingConfigRoutingMode(strings.ToUpper(n.RoutingMode)),
+			RoutingMode: googlecompute.NetworkRoutingConfigRoutingMode(strings.ToUpper(*n.RoutingMode)),
 		}
 	}
 
